@@ -1,4 +1,4 @@
-var KYCContract = artifacts.require("KYC");
+const KYCContract = artifacts.require("KYC");
 
 module.exports = function(deployer) {
   // deployment steps
