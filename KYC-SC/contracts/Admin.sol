@@ -17,7 +17,7 @@ contract Admin {
         string regNumber; //   registration number for the bank.
     }
 
-    uint256 internal activeBanksCount = 0;
+    uint256 public activeBanksCount = 0; // Count of Banks with Voting Rights set to true
 
     mapping(address => Bank) internal banks;
 

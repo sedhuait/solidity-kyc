@@ -16,17 +16,39 @@ contract KYC is Admin {
         address bank; // validated bank
     }
 
-
     struct KYCRequest{
         string username;
         address bankAddress;
         string customerData;
     }
 
-
     mapping(string => Customer) private customers;
 
+    mapping(string => uint256) private customerKYCCountMap;
+
     mapping(address => mapping(string => KYCRequest)) private bankCustomerKYCRequestsMap;
+
+    mapping(address => mapping (string => bool)) private bankCustomerVotingMap; // Bank To Customer Downvote mapping
+
+    modifier hasVotedAlready(string memory _customerName) {
+        Customer memory _detail = customers[_customerName];
+        require(
+            !bankCustomerVotingMap[msg.sender][string(abi.encodePacked(_customerName, _detail.data))],
+            "Already voted for the given customer");
+        _;
+    }
+
+    modifier kycExists(string memory _customerName) {
+        Customer memory _detail = customers[_customerName];
+        require(_detail.bank != address(0), "Customer doesn't exist");
+        require(customerKYCCountMap[_customerName] > 0, "No KYC Request exist for the given customer");
+        _;
+    }
+
+    function _recordVoting(string memory _customerName) private {
+        Customer storage _detail = customers[_customerName];
+        bankCustomerVotingMap[msg.sender][string(abi.encodePacked(_customerName, _detail.data))] = true;
+    }
 
     /// @notice Add customer api call
     /// @dev
@@ -39,13 +61,16 @@ contract KYC is Admin {
     }
 
     /// @notice Modify customer data API
-    /// @dev
+    /// @dev Resets customer votes and kyc status
     /// @param _customerName name of the customer
     /// @param _customerData datahash of the customer
     function modifyCustomer(string memory _customerName, string memory _customerData) public activeBank {
         Customer storage detail = customers[_customerName];
         require(detail.bank != address(0), "Customer doesn't exist");
         detail.data = _customerData;
+        detail.kycStatus = false;
+        detail.downVotes = 0;
+        detail.upVotes = 0;
     }
 
     /// @notice to view the customer data
@@ -78,22 +103,23 @@ contract KYC is Admin {
     /// @notice To Approve Customer KYC
     /// @dev
     /// @param _customerName unique name of the customer
-    function upvoteCustomer(string memory _customerName) public activeBank {
+    function upvoteCustomer(string memory _customerName) public activeBank kycExists(_customerName) hasVotedAlready(_customerName) {
         Customer storage detail = customers[_customerName];
         require(detail.bank != address(0), "Customer doesn't exist");
         detail.upVotes++;
         _checkCustomerKYCConditions(detail);
-
+        _recordVoting(_customerName);
     }
 
     /// @notice To decline customer KYC
     /// @dev
     /// @param _customerName unique name of the customer
-    function downvoteCustomer(string memory _customerName) public activeBank {
+    function downvoteCustomer(string memory _customerName) public activeBank kycExists(_customerName) hasVotedAlready(_customerName) {
         Customer storage detail = customers[_customerName];
         require(detail.bank != address(0), "Customer doesn't exist");
         detail.downVotes++;
         _checkCustomerKYCConditions(detail);
+        _recordVoting(_customerName);
     }
 
     /// @notice To initiate the KYC request. If customer is not present then it will be addded. Also if there is request already for the customer then error will be thrown
@@ -105,8 +131,14 @@ contract KYC is Admin {
         if(detail.bank == address(0)){ // Customer not present, so add to the system b4 initiating the KYC
             addCustomer(_customerName, _dataHash);
         }
-        require(bankCustomerKYCRequestsMap[msg.sender][_customerName].bankAddress == address(0),"Request Exist Already");
+        require(bankCustomerKYCRequestsMap[msg.sender][_customerName].bankAddress == address(0),"KYC Request Exist Already");
         bankCustomerKYCRequestsMap[msg.sender][_customerName] = KYCRequest(_customerName,msg.sender,_dataHash);
+        if(customerKYCCountMap[_customerName]>0){
+            customerKYCCountMap[_customerName]++;
+        }else{
+            customerKYCCountMap[_customerName] = 1;
+        }
+
         banks[msg.sender].kycCount++;
     }
 
@@ -114,8 +146,10 @@ contract KYC is Admin {
     /// @dev
     /// @param _customerName unique name of the customer
     function removeRequest(string calldata _customerName) external onlyBank {
-        require(bankCustomerKYCRequestsMap[msg.sender][_customerName].bankAddress != address(0),"Request not available");
+        require(bankCustomerKYCRequestsMap[msg.sender][_customerName].bankAddress != address(0),"KYC Request doesn't exist");
+        require(bankCustomerKYCRequestsMap[msg.sender][_customerName].bankAddress == msg.sender,"KYC was added by a different bank");
         delete(bankCustomerKYCRequestsMap[msg.sender][_customerName]);
+        customerKYCCountMap[_customerName]--;
     }
 
 }

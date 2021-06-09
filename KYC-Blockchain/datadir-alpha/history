@@ -1,0 +1,13 @@
+eth.coinbase
+miner.start()
+acc
+eth.getB
+eth.getBalance(eth.coinbase)
+eth.blockNumber
+web3.fromWei(eth.getBalance(eth.coinbase))
+eth.accounts
+miner.stop()
+eth.coinbase
+miner.start()
+miner.stop()
+miner.start()

@@ -1,0 +1,37 @@
+=============== Jun 9, 2021 (IST) ===============
+13:15:12.073387 log@legend F·NumFile S·FileSize N·Entry C·BadEntry B·BadBlock Ke·KeyError D·DroppedEntry L·Level Q·SeqNum T·TimeElapsed
+13:15:12.149337 db@open opening
+13:15:12.150348 version@stat F·[] S·0B[] Sc·[]
+13:15:12.188337 db@janitor F·2 G·0
+13:15:12.188442 db@open done T·39.081306ms
+13:15:19.107062 db@close closing
+13:15:19.107324 db@close done T·261.919µs
+=============== Jun 9, 2021 (IST) ===============
+13:15:45.918738 log@legend F·NumFile S·FileSize N·Entry C·BadEntry B·BadBlock Ke·KeyError D·DroppedEntry L·Level Q·SeqNum T·TimeElapsed
+13:15:45.919091 version@stat F·[] S·0B[] Sc·[]
+13:15:45.919126 db@open opening
+13:15:45.919252 journal@recovery F·1
+13:15:45.921049 journal@recovery recovering @1
+13:15:45.940309 memdb@flush created L0@2 N·24 S·797B "loc..seq,v4":"version,v1"
+13:15:45.942399 version@stat F·[1] S·797B[797B] Sc·[0.25]
+13:15:46.037294 db@janitor F·3 G·0
+13:15:46.037324 db@open done T·118.185134ms
+13:16:08.175336 db@close closing
+13:16:08.175592 db@close done T·252.998µs
+=============== Jun 9, 2021 (IST) ===============
+13:16:16.016297 log@legend F·NumFile S·FileSize N·Entry C·BadEntry B·BadBlock Ke·KeyError D·DroppedEntry L·Level Q·SeqNum T·TimeElapsed
+13:16:16.016976 version@stat F·[1] S·797B[797B] Sc·[0.25]
+13:16:16.017018 db@open opening
+13:16:16.017295 journal@recovery F·1
+13:16:16.019107 journal@recovery recovering @3
+13:16:16.038859 memdb@flush created L0@5 N·123 S·4KiB "loc..seq,v27":"n:\xf2..ail,v36"
+13:16:16.040968 version@stat F·[2] S·4KiB[4KiB] Sc·[0.50]
+13:16:16.137630 db@janitor F·4 G·0
+13:16:16.137657 db@open done T·120.62647ms
+13:16:23.179149 table@compaction L0·2 -> L1·0 S·4KiB Q·213
+13:16:23.200276 table@build created L1@8 N·130 S·4KiB "loc..seq,v27":"version,v1"
+13:16:23.200367 version@stat F·[0 1] S·4KiB[0B 4KiB] Sc·[0.00 0.00]
+13:16:23.238422 table@compaction committed F-1 S-520B Ke·0 D·17 T·59.123352ms
+13:16:23.239038 table@remove removed @2
+13:21:30.917544 db@close closing
+13:21:30.918073 db@close done T·532.663µs
